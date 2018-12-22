@@ -40,7 +40,7 @@
                 </ul>
             </td>
             <td>
-                <form th:method="post" th:action="@{http://localhost:9010/comments}">
+                <form th:method="post" th:action="@{/image/comments}">
                     <input name="comment" value="" type="text"/>
                     <input name="imageId" th:value="${image.id}" type="hidden"/>
                     <input type="submit"/>

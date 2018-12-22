@@ -1,13 +1,23 @@
 package aspire.demo.learningspringboot.image;
 
+import aspire.demo.learningspringboot.comment.Comment;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.cloud.stream.reactive.FluxSender;
+import org.springframework.cloud.stream.reactive.StreamEmitter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -18,6 +28,7 @@ import java.util.HashMap;
  * on: 2018/12/6 13:56
  */
 @Controller
+@EnableBinding(Source.class)
 public class ImageController {
 
     private static final String FILE_NAME = "{filename:.+}";
@@ -26,8 +37,23 @@ public class ImageController {
 
     private final CommentService commentService;
 
+    private FluxSink<Message<Comment>> commentSink;
 
-    public ImageController(ImageService imageService, CommentService commentService) {
+    private Flux<Message<Comment>> flux;
+
+    private final MeterRegistry meterRegistry;
+
+
+    public ImageController(MeterRegistry meterRegistry,
+                           ImageService imageService,
+                           CommentService commentService) {
+        this.flux = Flux.<Message<Comment>>create(
+                emitter -> this.commentSink = emitter,
+                FluxSink.OverflowStrategy.IGNORE
+        ).publish()
+                .autoConnect()
+        ;
+        this.meterRegistry = meterRegistry;
         this.imageService = imageService;
         this.commentService = commentService;
     }
@@ -76,5 +102,25 @@ public class ImageController {
         return imageService.deleteImage(filename)
                 .then(Mono.just("redirect:/"))
                 ;
+    }
+
+    @PostMapping("/image/comments")
+    public Mono<String> addComment(Mono<Comment> newComment) {
+        if(commentSink != null) {
+            return newComment
+                    .flatMap(c -> {
+                        commentSink.next(MessageBuilder.withPayload(c).build());
+                        meterRegistry.counter("comment.produced", "imageId", c.getImageId())
+                                .increment();
+                        return Mono.just("redirect:/");
+                    });
+        }else {
+            return Mono.just("redirect:/");
+        }
+    }
+
+    @StreamEmitter
+    public void emit(@Output(Source.OUTPUT) FluxSender sender) {
+        sender.send(this.flux);
     }
 }
