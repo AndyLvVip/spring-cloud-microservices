@@ -2,6 +2,7 @@ package aspire.demo.learningspringboot.image;
 
 import aspire.demo.learningspringboot.comment.Comment;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.http.entity.ContentType;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.messaging.Source;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -105,17 +107,23 @@ public class ImageController {
     }
 
     @PostMapping("/image/comments")
-    public Mono<String> addComment(Mono<Comment> newComment) {
+    @ResponseBody
+    public Mono<ResponseEntity<?>> addComment(Mono<Comment> newComment) {
         if(commentSink != null) {
             return newComment
-                    .flatMap(c -> {
-                        commentSink.next(MessageBuilder.withPayload(c).build());
+                    .map(c -> {
+                        commentSink.next(MessageBuilder.withPayload(c)
+                                .setHeader(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .build());
+                        return c;
+                    }).flatMap(c -> {
                         meterRegistry.counter("comment.produced", "imageId", c.getImageId())
                                 .increment();
-                        return Mono.just("redirect:/");
-                    });
+                        return Mono.just(ResponseEntity.noContent().build());
+                            }
+                    );
         }else {
-            return Mono.just("redirect:/");
+            return Mono.just(ResponseEntity.noContent().build());
         }
     }
 
