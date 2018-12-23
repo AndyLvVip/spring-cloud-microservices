@@ -1,5 +1,6 @@
 package aspire.demo.learningspringbootchat.comment;
 
+import aspire.demo.learningspringbootchat.chat.ChatServiceStreams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Service
-@EnableBinding(Sink.class)
+@EnableBinding(ChatServiceStreams.class)
 public class CommentService implements WebSocketHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommentService.class);
@@ -58,7 +59,7 @@ public class CommentService implements WebSocketHandler {
         );
     }
 
-    @StreamListener(Sink.INPUT)
+    @StreamListener(ChatServiceStreams.NEW_COMMENT)
     public void broadcast(Comment comment) {
         if(null != webSocketCommentSink) {
             LOG.info("Publishing " + comment + " to websocket...");
