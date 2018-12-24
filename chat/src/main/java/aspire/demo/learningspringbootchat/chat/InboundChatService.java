@@ -15,6 +15,7 @@ public class InboundChatService extends UserParsingHandshakeHandler {
     private final ChatServiceStreams chatServiceStreams;
 
     public InboundChatService(ChatServiceStreams chatServiceStreams) {
+        super();
         this.chatServiceStreams = chatServiceStreams;
     }
 
@@ -31,7 +32,6 @@ public class InboundChatService extends UserParsingHandshakeHandler {
                 .log("inbound-incoming-chat-message")
                 .map(WebSocketMessage::getPayloadAsText)
                 .log("inbound-convert-to-text")
-                .map(s -> session.getId() + ": " + s)
                 .log("inbound-mark-with-session-id")
                 .flatMap(msg -> broadcast(msg, getUser(session.getId())))
                 .log("inbound-broadcast-to broker")

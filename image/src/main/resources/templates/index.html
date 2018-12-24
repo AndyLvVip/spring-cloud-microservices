@@ -117,7 +117,7 @@
                     ul.appendChild(li);
                 };
 
-                outboundChatWebsocket = new WebSocket('ws://localhost:8200/app/chatMessage.new');
+                outboundChatWebsocket = new WebSocket('ws://localhost:8200/app/chatMessage.new?user=' + usernameInput.value);
                 outboundChatWebsocket.onopen = function (event) {
                     document.getElementById('chatButton')
                         .addEventListener('click', function () {

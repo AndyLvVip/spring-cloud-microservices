@@ -28,13 +28,15 @@ public abstract class UserParsingHandshakeHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        this.userMap.put(session.getId(), Stream.of(session.getHandshakeInfo().getUri().getQuery().split("&"))
-                .map(s -> s.split("="))
-                .filter(strings -> strings[0].equals("user"))
-                .findFirst()
-                .map(strings -> strings[1])
-                .orElse("")
-        );
+        if(null != session.getHandshakeInfo().getUri().getQuery()) {
+            this.userMap.put(session.getId(), Stream.of(session.getHandshakeInfo().getUri().getQuery().split("&"))
+                    .map(s -> s.split("="))
+                    .filter(strings -> strings[0].equals("user"))
+                    .findFirst()
+                    .map(strings -> strings[1])
+                    .orElse("")
+            );
+        }
         return handleInternal(session);
     }
 

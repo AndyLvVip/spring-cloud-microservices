@@ -7,14 +7,12 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Service
 @EnableBinding(ChatServiceStreams.class)
@@ -27,6 +25,7 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
     private FluxSink<Message<String>> chatMessageSink;
 
     public OutboundChatService() {
+        super();
         this.flux = Flux.<Message<String>>create(emitter -> this.chatMessageSink = emitter, FluxSink.OverflowStrategy.IGNORE)
         .publish()
         .autoConnect()
