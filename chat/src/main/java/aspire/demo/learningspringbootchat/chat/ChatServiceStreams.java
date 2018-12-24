@@ -6,11 +6,13 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
 
 public interface ChatServiceStreams {
-    String NEW_COMMENT = "newComment";
+    String NEW_COMMENT = "newComment" ;
 
-    String CLIENT_TO_BROKER = "clientToBroker";
+    String CLIENT_TO_BROKER = "clientToBroker" ;
 
-    String BROKER_TO_CLIENT = "brokerToClient";
+    String BROKER_TO_CLIENT = "brokerToClient" ;
+
+    String USER_HEADER = "user" ;
 
     @Input(NEW_COMMENT)
     SubscribableChannel newComment();

@@ -10,6 +10,9 @@
 <h3>Using LiveReload plugin in your browser will speed up your efforts</h3>
 <h3>It's really handy to make edits to local files to go out to cloud automatically.</h3>
 <h4 th:text="${extra}"/>
+<input id="username" type="text"/>
+<button id="connect">Connect</button>
+<button id="disconnect" style="display: none">Disconnect</button>
 <div>
     <table>
         <thead>
@@ -58,7 +61,7 @@
     <br/>
     <textarea id="chatDisplay" rows="10" cols="80" disabled="true"></textarea>
     <br/>
-    <input id="chatInput" type="text" style="width:500px" value=""/>
+    <input id="chatBox" type="text" style="width:500px; display: none" value=""/>
     <br/>
     <button id="chatButton">Send</button>
     <br/>
@@ -67,21 +70,12 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     (function() {
-        var socket = new WebSocket('ws://localhost:8200/topic/comment.new');
-        socket.onopen = function(event) {
-            console.log('Connected to chat service');
-            console.log(event);
-        }
 
-        socket.onmessage = function(event) {
-            console.log('Received ' + event.data + '!');
-            var passedMessage = JSON.parse(event.data);
+        var newCommentSocket;
 
-            var ul = document.getElementById('ul-comment-' + passedMessage.imageId);
-            var li = document.createElement('li');
-            li.appendChild(document.createTextNode(passedMessage.comment));
-            ul.appendChild(li);
-        }
+        var outboundChatWebsocket;
+
+        var inboundChatWebsocket;
 
         document.querySelectorAll('button.comment')
             .forEach(function(button) {
@@ -99,25 +93,66 @@
                 });
             });
 
-        var outboundChatMessage = new WebSocket('ws://localhost:8200/app/chatMessage.new');
-        outboundChatMessage.onopen = function (event) {
-            document.getElementById('chatButton')
-                .addEventListener('click', function () {
-                    var chatInput = document.getElementById('chatInput');
-                    console.log('Publishing "' + chatInput.value + '"');
-                    outboundChatMessage.send(chatInput.value);
-                    chatInput.value = '';
-                    chatInput.focus();
-                });
-        };
-        var inboundChatMessage = new WebSocket('ws://localhost:8200/topic/chatMessage.new');
-        inboundChatMessage.onmessage = function (event) {
-            console.log('Received ' + event.data);
-            var chatDisplay = document.getElementById('chatDisplay');
-            chatDisplay.value = chatDisplay.value + event.data + '\n';
-        };
+        document.getElementById('connect')
+            .addEventListener('click', function(event) {
+                document.getElementById('connect').style.display = 'none';
+                document.getElementById('disconnect').style.display = 'inline';
 
+                var usernameInput = document.getElementById('username');
+                document.getElementById('chatBox').style.display = 'inline';
 
+                newCommentSocket = new WebSocket('ws://localhost:8200/topic/comment.new');
+                newCommentSocket.onopen = function(event) {
+                    console.log('Connected to chat service');
+                    console.log(event);
+                }
+
+                newCommentSocket.onmessage = function(event) {
+                    console.log('Received ' + event.data + '!');
+                    var passedMessage = JSON.parse(event.data);
+
+                    var ul = document.getElementById('ul-comment-' + passedMessage.imageId);
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(passedMessage.comment));
+                    ul.appendChild(li);
+                };
+
+                outboundChatWebsocket = new WebSocket('ws://localhost:8200/app/chatMessage.new');
+                outboundChatWebsocket.onopen = function (event) {
+                    document.getElementById('chatButton')
+                        .addEventListener('click', function () {
+                            var chatInput = document.getElementById('chatBox');
+                            console.log('Publishing "' + chatBox.value + '"');
+                            outboundChatWebsocket.send(chatBox.value);
+                            chatBox.value = '';
+                            chatBox.focus();
+                        });
+                };
+
+                inboundChatWebsocket = new WebSocket('ws://localhost:8200/topic/chatMessage.new?user=' + usernameInput.value);
+                inboundChatWebsocket.onmessage = function (event) {
+                    console.log('Received ' + event.data);
+                    var chatDisplay = document.getElementById('chatDisplay');
+                    chatDisplay.value = chatDisplay.value + event.data + '\n';
+                };
+            });
+
+        document.getElementById('disconnect')
+            .addEventListener('click', function (event) {
+                document.getElementById('disconnect').style.display = 'none';
+                document.getElementById('connect').style.display = 'inline';
+                document.getElementById('chatBox').style.display = 'none';
+
+                if(null != newCommentSocket) {
+                    newCommentSocket.close();
+                }
+                if(null != outboundChatWebsocket) {
+                    outboundChatWebsocket.close();
+                }
+                if(null != inboundChatWebsocket) {
+                    inboundChatWebsocket.close();
+                }
+            });
 
     })();
     /*]]*/
