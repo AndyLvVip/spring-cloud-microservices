@@ -59,24 +59,23 @@ public class ImageService {
         return files
                 .log("createImage-files")
                 .flatMap(file -> {
-            Mono<Image> saveDatabaseImage = imageRepository.save(new Image(UUID.randomUUID().toString(), file.filename()))
-                    .log("createImage-save")
-                    ;
+                    Mono<Image> saveDatabaseImage = imageRepository.save(new Image(UUID.randomUUID().toString(), file.filename()))
+                            .log("createImage-save");
 
-            Mono<Void> copyFile = Mono.just(
-                    Paths.get(UPLOAD_ROOT, file.filename()).toFile()
-            ).log("createImage-lockTarget")
-                    .map(destFile -> {
-                        try {
-                            destFile.createNewFile();
-                            return destFile;
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .log("createImage-newfile")
-                    .flatMap(destFile -> file.transferTo(destFile))
-                    .log("createImage-copy");
+                    Mono<Void> copyFile = Mono.just(
+                            Paths.get(UPLOAD_ROOT, file.filename()).toFile()
+                    ).log("createImage-lockTarget")
+                            .map(destFile -> {
+                                try {
+                                    destFile.createNewFile();
+                                    return destFile;
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            })
+                            .log("createImage-newfile")
+                            .flatMap(destFile -> file.transferTo(destFile))
+                            .log("createImage-copy");
 
                     Mono<Void> countFile = Mono.fromRunnable(() -> {
                         meterRegistry
@@ -85,10 +84,10 @@ public class ImageService {
                                         .toFile().length());
 
                     });
-            return Mono.when(saveDatabaseImage, copyFile, countFile)
-                    .log("createImage-when")
-                    ;
-        }).then().log("createImage-done");
+                    return Mono.when(saveDatabaseImage, copyFile, countFile)
+                            .log("createImage-when")
+                            ;
+                }).then().log("createImage-done");
     }
 
     public Mono<Void> deleteImage(String filename) {
@@ -96,8 +95,7 @@ public class ImageService {
                 .findByName(filename)
                 .log("deleteImage-find")
                 .flatMap(imageRepository::delete)
-                .log("deleteImage-record")
-                ;
+                .log("deleteImage-record");
         Mono<Object> deleteFileAction = Mono.fromRunnable(() -> {
             try {
                 Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
@@ -105,14 +103,14 @@ public class ImageService {
                 throw new RuntimeException(e);
             }
         })
-                .log("deleteImage-file")
-                ;
+                .log("deleteImage-file");
         return Mono.when(deleteImageAction, deleteFileAction)
                 .log("deleteImage-when")
                 .then()
                 .log("deleteImage-done")
                 ;
     }
+
     public Mono<Resource> findOneImage(String filename) {
         return Mono.fromSupplier(() -> resourceLoader.getResource("file:" + UPLOAD_ROOT + "/" + filename));
     }

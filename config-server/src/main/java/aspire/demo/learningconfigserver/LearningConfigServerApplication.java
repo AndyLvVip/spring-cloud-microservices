@@ -8,9 +8,9 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 @EnableConfigServer
 public class LearningConfigServerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LearningConfigServerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LearningConfigServerApplication.class, args);
+    }
 
 }
 

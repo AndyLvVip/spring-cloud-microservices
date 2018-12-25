@@ -28,7 +28,7 @@ public abstract class UserParsingHandshakeHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        if(null != session.getHandshakeInfo().getUri().getQuery()) {
+        if (null != session.getHandshakeInfo().getUri().getQuery()) {
             this.userMap.put(session.getId(), Stream.of(session.getHandshakeInfo().getUri().getQuery().split("&"))
                     .map(s -> s.split("="))
                     .filter(strings -> strings[0].equals("user"))

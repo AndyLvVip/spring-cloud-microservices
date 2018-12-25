@@ -2,7 +2,6 @@ package aspire.demo.learningspringboot.image;
 
 import aspire.demo.learningspringboot.comment.Comment;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.apache.http.entity.ContentType;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.messaging.Source;
@@ -109,7 +108,7 @@ public class ImageController {
     @PostMapping("/image/comments")
     @ResponseBody
     public Mono<ResponseEntity<?>> addComment(Mono<Comment> newComment) {
-        if(commentSink != null) {
+        if (commentSink != null) {
             return newComment
                     .map(c -> {
                         commentSink.next(MessageBuilder.withPayload(c)
@@ -117,12 +116,12 @@ public class ImageController {
                                 .build());
                         return c;
                     }).flatMap(c -> {
-                        meterRegistry.counter("comment.produced", "imageId", c.getImageId())
-                                .increment();
-                        return Mono.just(ResponseEntity.noContent().build());
+                                meterRegistry.counter("comment.produced", "imageId", c.getImageId())
+                                        .increment();
+                                return Mono.just(ResponseEntity.noContent().build());
                             }
                     );
-        }else {
+        } else {
             return Mono.just(ResponseEntity.noContent().build());
         }
     }

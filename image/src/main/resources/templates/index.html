@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Learning Spring Boot: Spring-a-Gram</title>
-    <link rel="stylesheet" href="/main.css" />
+    <link rel="stylesheet" href="/main.css"/>
 </head>
 <body>
 <h1>Learning Spring Boot - 2nd Edition</h1>
@@ -17,29 +17,32 @@
     <table>
         <thead>
         <tr>
-            <th>Id</th><th>Name</th><th>Image</th><th></th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="image : ${images}">
-            <td th:text="${image.id}" />
-            <td th:text="${image.name}" />
+            <td th:text="${image.id}"/>
+            <td th:text="${image.name}"/>
             <td>
                 <a th:href="@{'/images/' + ${image.name} + '/raw'}">
                     <img th:src="@{'/images/'+${image.name}+'/raw'}"
-                         class="thumbnail" />
+                         class="thumbnail"/>
                 </a>
             </td>
             <td>
                 <form th:method="delete"
                       th:action="@{'/images/' + ${image.name}}">
-                    <input type="submit" value="Delete" />
+                    <input type="submit" value="Delete"/>
                 </form>
             </td>
             <td>
                 <ul th:id="'ul-comment-' + ${image.id}">
                     <li th:each="comment: ${image.comments}"
-                    th:text="${comment.comment}"></li>
+                        th:text="${comment.comment}"></li>
                 </ul>
             </td>
             <td>
@@ -51,8 +54,8 @@
     </table>
     <form method="post" enctype="multipart/form-data"
           action="/images">
-        <p><input type="file" name="file" /></p>
-        <p><input type="submit" value="Upload" /></p>
+        <p><input type="file" name="file"/></p>
+        <p><input type="submit" value="Upload"/></p>
     </form>
 </div>
 
@@ -69,7 +72,7 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    (function() {
+    (function () {
 
         var newCommentSocket;
 
@@ -78,8 +81,8 @@
         var inboundChatWebsocket;
 
         document.querySelectorAll('button.comment')
-            .forEach(function(button) {
-                button.addEventListener('click', function() {
+            .forEach(function (button) {
+                button.addEventListener('click', function () {
                     var comment = document.getElementById('comment-' + button.id);
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST',/*[[@{'/image/comments'}]]*/'', true);
@@ -94,7 +97,7 @@
             });
 
         document.getElementById('connect')
-            .addEventListener('click', function(event) {
+            .addEventListener('click', function (event) {
                 document.getElementById('connect').style.display = 'none';
                 document.getElementById('disconnect').style.display = 'inline';
 
@@ -102,12 +105,12 @@
                 document.getElementById('chatBox').style.display = 'inline';
 
                 newCommentSocket = new WebSocket('ws://localhost:8200/topic/comment.new');
-                newCommentSocket.onopen = function(event) {
+                newCommentSocket.onopen = function (event) {
                     console.log('Connected to chat service');
                     console.log(event);
                 }
 
-                newCommentSocket.onmessage = function(event) {
+                newCommentSocket.onmessage = function (event) {
                     console.log('Received ' + event.data + '!');
                     var passedMessage = JSON.parse(event.data);
 
@@ -143,13 +146,13 @@
                 document.getElementById('connect').style.display = 'inline';
                 document.getElementById('chatBox').style.display = 'none';
 
-                if(null != newCommentSocket) {
+                if (null != newCommentSocket) {
                     newCommentSocket.close();
                 }
-                if(null != outboundChatWebsocket) {
+                if (null != outboundChatWebsocket) {
                     outboundChatWebsocket.close();
                 }
-                if(null != inboundChatWebsocket) {
+                if (null != inboundChatWebsocket) {
                     inboundChatWebsocket.close();
                 }
             });

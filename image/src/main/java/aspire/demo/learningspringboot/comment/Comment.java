@@ -5,7 +5,8 @@ import org.springframework.data.annotation.Id;
 
 @Data
 public class Comment {
-    @Id private String id;
+    @Id
+    private String id;
 
     private String imageId;
 

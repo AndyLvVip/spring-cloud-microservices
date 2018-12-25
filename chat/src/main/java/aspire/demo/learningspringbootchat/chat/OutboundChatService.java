@@ -27,14 +27,14 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
     public OutboundChatService() {
         super();
         this.flux = Flux.<Message<String>>create(emitter -> this.chatMessageSink = emitter, FluxSink.OverflowStrategy.IGNORE)
-        .publish()
-        .autoConnect()
+                .publish()
+                .autoConnect()
         ;
     }
 
     @StreamListener(ChatServiceStreams.BROKER_TO_CLIENT)
     public void listen(Message<String> message) {
-        if(chatMessageSink != null) {
+        if (chatMessageSink != null) {
             LOG.info("Publishing " + message + " to websocket...");
             chatMessageSink.next(message);
         }
@@ -52,20 +52,20 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
     }
 
     private boolean validate(Message<String> message, String user) {
-        if(message.getPayload().startsWith("@")) {
+        if (message.getPayload().startsWith("@")) {
             String targetUser = message.getPayload().substring(1, message.getPayload().indexOf(" "));
             String sender = message.getHeaders().get(ChatServiceStreams.USER_HEADER, String.class);
             return Arrays.asList(targetUser, sender).contains(user);
-        }else {
+        } else {
             return true;
         }
     }
 
     private String transfer(Message<String> message) {
         String user = message.getHeaders().get(ChatServiceStreams.USER_HEADER, String.class);
-        if(message.getPayload().startsWith("@")) {
+        if (message.getPayload().startsWith("@")) {
             return "(" + user + "): " + message.getPayload();
-        }else {
+        } else {
             return "(" + user + ")(all): " + message.getPayload();
         }
     }

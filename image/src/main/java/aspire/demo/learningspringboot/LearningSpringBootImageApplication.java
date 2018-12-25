@@ -6,9 +6,9 @@ import org.springframework.cloud.client.SpringCloudApplication;
 @SpringCloudApplication
 public class LearningSpringBootImageApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LearningSpringBootImageApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LearningSpringBootImageApplication.class, args);
+    }
 
 }
 

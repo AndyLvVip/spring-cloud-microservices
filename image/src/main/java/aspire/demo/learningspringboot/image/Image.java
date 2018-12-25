@@ -12,7 +12,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class Image {
 
-    @Id private final String id;
-        private final String name;
+    @Id
+    private final String id;
+    private final String name;
 
 }

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -32,7 +31,7 @@ public class CommentService implements WebSocketHandler {
     public CommentService(ObjectMapper objectMapper) {
         this.mapper = objectMapper;
         this.flux = Flux.<Comment>create(emitter -> this.webSocketCommentSink = emitter, FluxSink.OverflowStrategy.IGNORE)
-        .publish().autoConnect()
+                .publish().autoConnect()
 
         ;
 
@@ -61,7 +60,7 @@ public class CommentService implements WebSocketHandler {
 
     @StreamListener(ChatServiceStreams.NEW_COMMENT)
     public void broadcast(Comment comment) {
-        if(null != webSocketCommentSink) {
+        if (null != webSocketCommentSink) {
             LOG.info("Publishing " + comment + " to websocket...");
             webSocketCommentSink.next(comment);
         }
