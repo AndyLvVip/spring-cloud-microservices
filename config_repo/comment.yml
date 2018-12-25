@@ -1,0 +1,19 @@
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8671:/eureka/
+server:
+  port: 9010
+
+spring:
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: learning-spring-boot-comment
+          group: learning-spring-boot
+          content-type: application/json
+        output:
+          destination: learning-spring-boot-chat
+          group: comment-chat
+          content-type: application/json

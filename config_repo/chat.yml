@@ -1,0 +1,45 @@
+server:
+  port: 8200
+spring:
+  cloud:
+    stream:
+      bindings:
+        newComment:
+          destination: learning-spring-boot-chat
+          group: comment-chat
+          content-type: application/json
+        clientToBroker:
+          destination: learning-spring-boot-chat-user-message
+          group: app-chat-message
+        brokerToClient:
+          destination: learning-spring-boot-chat-user-message
+          group: topic-chat-message
+    gateway:
+      routes:
+        # ========================
+        - id: imageService
+          uri: lb://IMAGE
+          predicates:
+            - Path=/imageServices/**
+          filters:
+            - RewritePath=/imageService/(?<segment>.*), /$\{segment}
+            - RewritePath=/imageService, /
+            - SaveSession
+        - id: images
+          uri: lb://IMAGE
+          predicates:
+            - Path=/images/**
+          filters:
+            - SaveSession
+        - id: mainCss
+          uri: lb://IMAGE
+          predicates:
+            - Path=/main.css
+          filters:
+            - SaveSession
+        - id: commentService
+          uri: lb://IMAGE
+          predicates:
+            - Path=/image/comments
+          filters:
+            - SaveSession
