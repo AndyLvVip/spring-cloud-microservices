@@ -14,32 +14,32 @@ spring:
         brokerToClient:
           destination: learning-spring-boot-chat-user-message
           group: topic-chat-message
-    gateway:
-      routes:
-        # ========================
-        - id: imageService
-          uri: lb://IMAGE
-          predicates:
-            - Path=/imageServices/**
-          filters:
-            - RewritePath=/imageService/(?<segment>.*), /$\{segment}
-            - RewritePath=/imageService, /
-            - SaveSession
-        - id: images
-          uri: lb://IMAGE
-          predicates:
-            - Path=/images/**
-          filters:
-            - SaveSession
-        - id: mainCss
-          uri: lb://IMAGE
-          predicates:
-            - Path=/main.css
-          filters:
-            - SaveSession
-        - id: commentService
-          uri: lb://IMAGE
-          predicates:
-            - Path=/image/comments
-          filters:
-            - SaveSession
+#    gateway:
+#      routes:
+#        # ========================
+#        - id: imageService
+#          uri: lb://IMAGE
+#          predicates:
+#            - Path=/imageServices/**
+#          filters:
+#            - RewritePath=/imageService/(?<segment>.*), /$\{segment}
+#            - RewritePath=/imageService, /
+#            - SaveSession
+#        - id: images
+#          uri: lb://IMAGE
+#          predicates:
+#            - Path=/images/**
+#          filters:
+#            - SaveSession
+#        - id: mainCss
+#          uri: lb://IMAGE
+#          predicates:
+#            - Path=/main.css
+#          filters:
+#            - SaveSession
+#        - id: commentService
+#          uri: lb://IMAGE
+#          predicates:
+#            - Path=/image/comments
+#          filters:
+#            - SaveSession

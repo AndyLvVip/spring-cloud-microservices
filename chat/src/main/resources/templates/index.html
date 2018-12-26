@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Learning Spring Boot: Spring-a-Gram</title>
+</head>
+<body>
+<div id="images">
+
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+(function () {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', /*[[@{'/imageService'}]]*/'', true);
+        xhr.onload = function (e) {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    document.getElementById("images").innerHTML
+                        = xhr.responseText;
+                    eval(document.getElementsByTagName('script')[0].innerHTML);
+                }
+            }
+        }
+        xhr.send(null);
+    }
+)();
+/*]]>*/
+</script>
+
+</body>
+</html>
