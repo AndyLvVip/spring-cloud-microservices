@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Learning Spring Boot: Spring-a-Gram</title>
-    <link rel="stylesheet" href="/main.css"/>
+    <link href="/main.css" rel="stylesheet"/>
 </head>
 <body>
 <h1>Learning Spring Boot - 2nd Edition</h1>
@@ -29,13 +29,13 @@
             <td th:text="${image.name}"/>
             <td>
                 <a th:href="@{'/images/' + ${image.name} + '/raw'}">
-                    <img th:src="@{'/images/'+${image.name}+'/raw'}"
-                         class="thumbnail"/>
+                    <img class="thumbnail"
+                         th:src="@{'/images/'+${image.name}+'/raw'}"/>
                 </a>
             </td>
             <td>
-                <form th:method="delete"
-                      th:action="@{'/images/' + ${image.name}}">
+                <form th:action="@{'/images/' + ${image.name}}"
+                      th:method="delete">
                     <input type="submit" value="Delete"/>
                 </form>
             </td>
@@ -47,14 +47,14 @@
             </td>
             <td>
                 <input th:id="'comment-' + ${image.id}" type="text" value=""/>
-                <button th:id="${image.id}" class="comment">Submit</button>
+                <button class="comment" th:id="${image.id}">Submit</button>
             </td>
         </tr>
         </tbody>
     </table>
-    <form method="post" enctype="multipart/form-data"
-          action="/images">
-        <p><input type="file" name="file"/></p>
+    <form action="/images" enctype="multipart/form-data"
+          method="post">
+        <p><input name="file" type="file"/></p>
         <p><input type="submit" value="Upload"/></p>
     </form>
 </div>
@@ -62,9 +62,9 @@
 <div id="checkBox">
     Greetings!
     <br/>
-    <textarea id="chatDisplay" rows="10" cols="80" disabled="true"></textarea>
+    <textarea cols="80" disabled="true" id="chatDisplay" rows="10"></textarea>
     <br/>
-    <input id="chatBox" type="text" style="width:500px; display: none" value=""/>
+    <input id="chatBox" style="width:500px; display: none" type="text" value=""/>
     <br/>
     <button id="chatButton">Send</button>
     <br/>
@@ -72,7 +72,7 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    (function() {
+    (function () {
 
         var newCommentSocket;
 

@@ -37,12 +37,9 @@ public class ImageController {
     private final ImageService imageService;
 
     private final CommentService commentService;
-
-    private FluxSink<Message<Comment>> commentSink;
-
-    private Flux<Message<Comment>> flux;
-
     private final MeterRegistry meterRegistry;
+    private FluxSink<Message<Comment>> commentSink;
+    private Flux<Message<Comment>> flux;
 
 
     public ImageController(MeterRegistry meterRegistry,

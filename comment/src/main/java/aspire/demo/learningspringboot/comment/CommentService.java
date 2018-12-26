@@ -14,9 +14,9 @@ import reactor.core.publisher.Flux;
 @Service
 @EnableBinding(Processor.class)
 public class CommentService {
+    static final Logger LOG = LoggerFactory.getLogger(CommentService.class);
     private final CommentRepository repository;
     private final MeterRegistry meterRegistry;
-    static final Logger LOG = LoggerFactory.getLogger(CommentService.class);
 
     public CommentService(CommentRepository repository,
                           MeterRegistry meterRegistry) {

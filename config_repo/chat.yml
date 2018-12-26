@@ -43,3 +43,6 @@ spring:
 #            - Path=/image/comments
 #          filters:
 #            - SaveSession
+logging:
+  level:
+    ROOT: debug
