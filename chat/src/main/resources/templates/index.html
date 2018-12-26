@@ -19,7 +19,95 @@
                 if (xhr.status === 200) {
                     document.getElementById("images").innerHTML
                         = xhr.responseText;
-                    eval(document.getElementsByTagName('script')[0].innerHTML);
+
+                    (function () {
+
+                        var newCommentSocket;
+
+                        var outboundChatWebsocket;
+
+                        var inboundChatWebsocket;
+
+                        document.querySelectorAll('button.comment')
+                            .forEach(function (button) {
+                                console.log('Registry click event for button', button.id);
+                                button.addEventListener('click', function () {
+                                    var comment = document.getElementById('comment-' + button.id);
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('POST',"\/image\/comments", true);
+
+                                    var formData = new FormData();
+                                    formData.append('comment', comment.value);
+                                    formData.append('imageId', button.id);
+                                    xhr.send(formData);
+
+                                    comment.value = '';
+                                });
+                            });
+
+                        newCommentSocket = new WebSocket('ws://localhost:8200/topic/comment.new');
+                        newCommentSocket.onopen = function (event) {
+                            console.log('Connected to comment service');
+                        }
+
+                        newCommentSocket.onmessage = function (event) {
+                            console.log('Received ' + event.data + '!');
+                            var passedMessage = JSON.parse(event.data);
+
+                            var ul = document.getElementById('ul-comment-' + passedMessage.imageId);
+                            var li = document.createElement('li');
+                            li.appendChild(document.createTextNode(passedMessage.comment));
+                            ul.appendChild(li);
+                        };
+
+                        document.getElementById('connect')
+                            .addEventListener('click', function (event) {
+                                document.getElementById('connect').style.display = 'none';
+                                document.getElementById('disconnect').style.display = 'inline';
+
+                                var usernameInput = document.getElementById('username');
+                                document.getElementById('chatBox').style.display = 'inline';
+
+
+                                outboundChatWebsocket = new WebSocket('ws://localhost:8200/app/chatMessage.new?user=' + usernameInput.value);
+                                outboundChatWebsocket.onopen = function (event) {
+                                    console.log('Connected to send message service');
+                                    document.getElementById('chatButton')
+                                        .addEventListener('click', function () {
+                                            var chatInput = document.getElementById('chatBox');
+                                            console.log('Publishing "' + chatBox.value + '"');
+                                            outboundChatWebsocket.send(chatBox.value);
+                                            chatBox.value = '';
+                                            chatBox.focus();
+                                        });
+                                };
+
+                                inboundChatWebsocket = new WebSocket('ws://localhost:8200/topic/chatMessage.new?user=' + usernameInput.value);
+                                inboundChatWebsocket.onopen = function () {
+                                    console.log('Connected to rec message service');
+
+                                };
+                                inboundChatWebsocket.onmessage = function (event) {
+                                    console.log('Received ' + event.data);
+                                    var chatDisplay = document.getElementById('chatDisplay');
+                                    chatDisplay.value = chatDisplay.value + event.data + '\n';
+                                };
+                            });
+
+                        document.getElementById('disconnect')
+                            .addEventListener('click', function (event) {
+                                document.getElementById('disconnect').style.display = 'none';
+                                document.getElementById('connect').style.display = 'inline';
+                                document.getElementById('chatBox').style.display = 'none';
+                                if (null != outboundChatWebsocket) {
+                                    outboundChatWebsocket.close();
+                                }
+                                if (null != inboundChatWebsocket) {
+                                    inboundChatWebsocket.close();
+                                }
+                            });
+
+                    })();
                 }
             }
         }
