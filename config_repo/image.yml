@@ -17,3 +17,6 @@ spring:
           destination: learning-spring-boot-comment
           group: learning-spring-boot
           content-type: application/json
+logging:
+  level:
+    ROOT: debug

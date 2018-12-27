@@ -19,9 +19,9 @@ public class InitDatabase {
     public CommandLineRunner initImageCollection(MongoOperations operations) {
         return args -> {
             operations.dropCollection(Image.class);
-            operations.insertAll(Arrays.asList(new Image("1", "learning-spring-boot-cover.jpg"),
-                    new Image("2", "learning-spring-boot-2nd-edition-cover.jpg"),
-                    new Image("3", "bazinga.png")
+            operations.insertAll(Arrays.asList(new Image("1", "learning-spring-boot-cover.jpg", "andy"),
+                    new Image("2", "learning-spring-boot-2nd-edition-cover.jpg", "andy"),
+                    new Image("3", "bazinga.png", "admin")
             ));
             operations.findAll(Image.class).forEach(c -> System.out.println(c.toString()));
         };

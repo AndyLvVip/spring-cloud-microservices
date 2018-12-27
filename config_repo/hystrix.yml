@@ -1,2 +1,5 @@
 server:
   port: 7979
+logging:
+  level:
+    ROOT: debug

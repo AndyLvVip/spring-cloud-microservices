@@ -17,3 +17,6 @@ spring:
           destination: learning-spring-boot-chat
           group: comment-chat
           content-type: application/json
+logging:
+  level:
+    ROOT: debug

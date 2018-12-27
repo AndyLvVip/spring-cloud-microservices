@@ -14,6 +14,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 
 /**
@@ -66,6 +68,7 @@ public class ImageController {
                 ).map(imageAndComment -> new HashMap() {{
                     put("id", imageAndComment.getT1().getId());
                     put("name", imageAndComment.getT1().getName());
+                    put("owner", imageAndComment.getT1().getOwner());
                     put("comments", imageAndComment.getT2());
                 }})
         );
@@ -74,8 +77,9 @@ public class ImageController {
     }
 
     @PostMapping("/images")
-    public Mono<String> createImage(@RequestPart(name = "file") Flux<FilePart> files) {
-        return imageService.createImage(files)
+    public Mono<String> createImage(@RequestPart(name = "file") Flux<FilePart> files,
+                                    @AuthenticationPrincipal Principal principal) {
+        return imageService.createImage(files, principal)
                 .then(Mono.just("redirect:/"))
                 ;
     }

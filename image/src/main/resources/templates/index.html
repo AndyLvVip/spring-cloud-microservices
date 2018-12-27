@@ -39,6 +39,9 @@
                     <input type="submit" value="Delete"/>
                 </form>
             </td>
+            <td th:text="${image.owner}">
+
+            </td>
             <td>
                 <ul th:id="'ul-comment-' + ${image.id}">
                     <li th:each="comment: ${image.comments}"
