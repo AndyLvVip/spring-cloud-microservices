@@ -12,23 +12,27 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CustomGateway {
 
-
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         final String LB_IMAGE = "lb://IMAGE";
         return builder.routes()
                 .route("imageService", r -> r.path("/imageService/**")
                         .filters(f -> f.rewritePath("/imageService/(?<segment>.*)", "/${segment}")
-                                .rewritePath("/imageService", "/"))
+                                .rewritePath("/imageService", "/")
+                                .saveSession()
+                        )
                         .uri(LB_IMAGE)
                 )
                 .route("images", r -> r.path("/images/**")
+                        .filters(f -> f.saveSession())
                         .uri(LB_IMAGE)
                 )
                 .route("mainCss", r -> r.path("/main.css")
+                        .filters(f -> f.saveSession())
                         .uri(LB_IMAGE)
                 )
                 .route("imageComments", r -> r.path("/image/comments/**")
+                        .filters(f -> f.saveSession())
                         .uri(LB_IMAGE)
                 )
                 .build();
