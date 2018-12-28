@@ -1,3 +1,7 @@
 spring:
   application:
     name: image
+  cloud:
+    config:
+      password: passw0rd
+      username: andy

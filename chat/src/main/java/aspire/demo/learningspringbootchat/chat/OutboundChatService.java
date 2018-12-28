@@ -43,13 +43,14 @@ public class OutboundChatService extends AuthorizedWebSocketHandler {
 
     @Override
     public Mono<Void> handleInternal(WebSocketSession session) {
-        return session.send(this.flux
-                .filter(msg -> validate(msg, session))
-                .map(this::transfer)
-                .map(session::textMessage)
-        )
-                .log(session.getId() + "outbound-wrap-as-websocket-message")
-                .log(session.getId() + "outbound-publish-to-websocket")
+        return
+                session.send(this.flux
+                        .filter(msg -> validate(msg, session))
+                        .map(this::transfer)
+                        .map(session::textMessage)
+                )
+                        .log(session.getId() + "-outbound-wrap-as-websocket-message")
+                        .log(session.getId() + "-outbound-publish-to-websocket")
                 ;
     }
 

@@ -80,6 +80,7 @@ public class ImageService {
                             .flatMap(destFile -> file.transferTo(destFile))
                             .log("createImage-copy");
 
+
                     Mono<Void> countFile = Mono.fromRunnable(() -> {
                         meterRegistry
                                 .summary("files.uploaded.bytes")

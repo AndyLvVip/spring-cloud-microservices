@@ -1,3 +1,7 @@
+eureka:
+  client:
+    service-url:
+      default-zone: http://andy:passw0rd@localhost:8671/eureka/
 server:
   port: 8200
 spring:

@@ -1,7 +1,7 @@
 eureka:
   client:
     service-url:
-      default-zone: http://localhost:8671:/eureka/
+      default-zone: http://andy:passw0rd@localhost:8671/eureka/
 server:
   port: 9010
 
