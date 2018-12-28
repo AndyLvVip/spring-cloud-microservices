@@ -36,7 +36,7 @@ public class ImageSimulator {
     @EventListener
     public void simulateUserClicking(ApplicationReadyEvent event) {
         Flux.interval(Duration.ofMillis(500))
-                .flatMap(tick -> Mono.defer(() -> imageController.index(new BindingAwareModelMap())))
+                .flatMap(tick -> Mono.defer(() -> imageController.index(null, new BindingAwareModelMap())))
                 .subscribe();
 
     }

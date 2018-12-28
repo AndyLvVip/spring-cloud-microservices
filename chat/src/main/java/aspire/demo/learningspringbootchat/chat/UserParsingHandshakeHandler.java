@@ -1,4 +1,4 @@
-package aspire.demo.learningspringbootchat;
+package aspire.demo.learningspringbootchat.chat;
 
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;

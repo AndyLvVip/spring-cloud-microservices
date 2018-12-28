@@ -1,6 +1,5 @@
 package aspire.demo.learningspringbootchat.chat;
 
-import aspire.demo.learningspringbootchat.UserParsingHandshakeHandler;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -10,33 +9,38 @@ import reactor.core.publisher.Mono;
 
 @Service
 @EnableBinding(ChatServiceStreams.class)
-public class InboundChatService extends UserParsingHandshakeHandler {
+public class InboundChatService extends AuthorizedWebSocketHandler {
 
     private final ChatServiceStreams chatServiceStreams;
 
     public InboundChatService(ChatServiceStreams chatServiceStreams) {
-        super();
         this.chatServiceStreams = chatServiceStreams;
     }
 
-    public Mono<?> broadcast(String message, String user) {
-        return Mono.fromRunnable(() -> chatServiceStreams.clientToBroker()
-                .send(MessageBuilder.withPayload(message)
-                        .setHeader(ChatServiceStreams.USER_HEADER, user)
-                        .build()));
+    public Mono<?> broadcast(String message, WebSocketSession user) {
+
+        return user.getHandshakeInfo().getPrincipal()
+                .map(p -> chatServiceStreams.clientToBroker()
+                        .send(MessageBuilder.withPayload(message)
+                                .setHeader(ChatServiceStreams.USER_HEADER, p.getName())
+                                .build()
+
+                        )
+                );
     }
 
     @Override
     public Mono<Void> handleInternal(WebSocketSession session) {
-        return session.receive()
-                .log("inbound-incoming-chat-message")
+        return session
+                .receive()
+                .log(session.getId() + "inbound-incoming-chat-message")
                 .map(WebSocketMessage::getPayloadAsText)
-                .log("inbound-convert-to-text")
-                .log("inbound-mark-with-session-id")
-                .flatMap(msg -> broadcast(msg, getUser(session.getId())))
-                .log("inbound-broadcast-to broker")
-                .then()
+                .log(session.getId() + "inbound-convert-to-text")
+                .log(session.getId() + "inbound-mark-with-session-id")
 
+                .flatMap(msg -> broadcast(msg, session))
+                .log(session.getId() + "inbound-broadcast-to broker")
+                .then()
                 ;
     }
 }

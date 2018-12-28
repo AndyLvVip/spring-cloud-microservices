@@ -1,6 +1,5 @@
 package aspire.demo.learningspringbootchat.chat;
 
-import aspire.demo.learningspringbootchat.UserParsingHandshakeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -11,12 +10,14 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
+import java.security.Principal;
 import java.util.Arrays;
 
 @Service
 @EnableBinding(ChatServiceStreams.class)
-public class OutboundChatService extends UserParsingHandshakeHandler {
+public class OutboundChatService extends AuthorizedWebSocketHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutboundChatService.class);
 
@@ -43,19 +44,21 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
     @Override
     public Mono<Void> handleInternal(WebSocketSession session) {
         return session.send(this.flux
-                .filter(s -> validate(s, getUser(session.getId())))
+                .filter(msg -> validate(msg, session))
                 .map(this::transfer)
-                .map(session::textMessage))
-                .log(getUser(session.getId()) + "-outbound-wrap-as-websocket-message")
-                .log(getUser(session.getId()) + "-outbound-publish-to-websocket")
+                .map(session::textMessage)
+        )
+                .log(session.getId() + "outbound-wrap-as-websocket-message")
+                .log(session.getId() + "outbound-publish-to-websocket")
                 ;
     }
 
-    private boolean validate(Message<String> message, String user) {
+    private boolean validate(Message<String> message, WebSocketSession user) {
         if (message.getPayload().startsWith("@")) {
             String targetUser = message.getPayload().substring(1, message.getPayload().indexOf(" "));
             String sender = message.getHeaders().get(ChatServiceStreams.USER_HEADER, String.class);
-            return Arrays.asList(targetUser, sender).contains(user);
+            Principal principal = user.getHandshakeInfo().getPrincipal().block();
+            return null != principal && Arrays.asList(targetUser, sender).contains(principal.getName());
         } else {
             return true;
         }

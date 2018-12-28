@@ -14,6 +14,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,7 +60,8 @@ public class ImageController {
     }
 
     @GetMapping("/")
-    public Mono<String> index(Model model) {
+    public Mono<String> index(@AuthenticationPrincipal Authentication authentication,
+                              Model model) {
         model.addAttribute("images", imageService.findAllImages()
                 .flatMap(image -> Mono.just(image)
                         .zipWith(
@@ -72,6 +74,7 @@ public class ImageController {
                     put("comments", imageAndComment.getT2());
                 }})
         );
+        model.addAttribute("auth", authentication);
         model.addAttribute("extra", "DevTools can also detect changes too");
         return Mono.just("index");
     }
