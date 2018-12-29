@@ -24,7 +24,7 @@ public class LearningSpringBootEurekaServerApplication {
                 User.withUsername("andy")
                         .password("passw0rd")
                         .passwordEncoder(s -> passwordEncoder.encode(s))
-                        .roles("USER")
+                        .roles("ADMIN")
                         .build()
         );
     }
